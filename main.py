@@ -34,3 +34,6 @@ max_tweets = 10
 
 for tweets in tweepy.Cursor(api.search, q=query).items(max_tweets):
     store_tweet(tweets._json)
+
+
+exit(1)
