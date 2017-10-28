@@ -3,10 +3,14 @@ from tweepy import OAuthHandler
 import json
 from pprint import pprint
 
+def store_tweet(tweet):
+    json_tweet = json.dumps(tweet)
+    pprint(json_tweet)
+    with open('tweets.json', mode='a', encoding='utf-8') as feedsjson:
+        json.dump(json_tweet, feedsjson)
+
 with open('accountInfo.json') as data_file:
     accInfo = json.load(data_file)
-
-pprint(accInfo)
 
 # Create variables for each key, secret, token
 consumer_key = accInfo["consumer_key"]
@@ -21,6 +25,6 @@ api = tweepy.API(auth)
 
 query = '#thy'
 max_tweets = 10
+
 for tweets in tweepy.Cursor(api.search, q=query).items(max_tweets):
-    pprint(tweets._json)
-# json.dumps(searched_tweets)
+    store_tweet(tweets._json)
