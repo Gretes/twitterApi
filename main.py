@@ -1,7 +1,6 @@
 import tweepy
 from tweepy import OAuthHandler
 import json
-from pprint import pprint
 from pymongo import MongoClient
 
 client = MongoClient('mongodb://veli:kamil7insan@ds237445.mlab.com:37445/heroku_wzpvdrhs')
