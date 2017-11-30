@@ -5,12 +5,12 @@ from pymongo import MongoClient
 
 client = MongoClient('mongodb://veli:kamil7insan@ds237445.mlab.com:37445/heroku_wzpvdrhs')
 db = client['heroku_wzpvdrhs']
-collection = db.thy
+collection = db.digiturk
 
 print(collection)
 
 def store_tweet(tweet):
-    json_tweet = json.dumps(tweet)
+    #json_tweet = json.dumps(tweet)
     # pprint(json_tweet)
     collection.insert_one(tweet)
 
@@ -28,7 +28,7 @@ auth.set_access_token(access_token, access_token_secret)
 
 api = tweepy.API(auth)
 
-query = '#thy'
+query = '#digiturk'
 max_tweets = 10
 
 for tweets in tweepy.Cursor(api.search, q=query).items(max_tweets):
