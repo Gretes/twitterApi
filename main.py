@@ -17,14 +17,20 @@ max_id = last_item["id_str"]
 
 print(collection, '\n', start_date, max_id)
 
+collection = db.bein1
+
 def store_tweet(tweet):
-    try:
-        collection.insert_one(tweet)
-    except Exception as e:
-        exception_name, exception_value = sys.exc_info()[:2]
-        print(exception_name, exception_value)
-    finally:
-        return True
+    while True:
+        try:
+            result = collection.insert_one(tweet)
+        except Exception as e:
+            exception_name, exception_value = sys.exc_info()[:2]
+            print(exception_name, exception_value)
+            continue
+
+        if(result.acknowledged):
+            print('added')
+            break
 
 with open('accountInfo.json') as data_file:
     accInfo = json.load(data_file)
@@ -42,20 +48,23 @@ api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 query = '@beINSPORTS_TR'
 max_tweets = 100000
-tweets = tweepy.Cursor(api.search, q=query, since=start_date).items(max_tweets)
+tweets = tweepy.Cursor(api.search, q=query, since=start_date, count=100).items(max_tweets)
 
 while True:
     try:
         for tweet in tweets:
+            sleep(0.25)
             print(tweet.created_at, tweet.user.name)
-            # store_tweet(tweet._json)
+            store_tweet(tweet._json)
         break
     except tweepy.TweepError:
-        sleep(60*15)
+        print('DEBUG: tweepy error')
+        sleep(60)
         continue
 
     except IOError:
-        sleep(60*5)
+        print('DEBUG: io error')
+        sleep(60)
         continue
 
     except StopIteration:
