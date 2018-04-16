@@ -34,7 +34,7 @@ class TW(object):
     def store_tweet(tweet):
         while True:
             try:
-                result = collection.insert_one(tweet)
+                # result = collection.insert_one(tweet)
                 print(tweet)
             except Exception as e:
                 exception_name, exception_value = sys.exc_info()[:2]
@@ -60,16 +60,21 @@ auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 query = '@beINSPORTS_TR'
+query = "Mayıs başında Oyunlara başlayacağız. Bitince dünyanın en iyi salonları arasına girecek. Üç kat içinde gezinip, oyuncularla oyun öncesi ve sonrası muhabbet edip, resimler ve kitaplarla eve dönebileceksiniz."
 max_tweets = 10
-tweets = tweepy.Cursor(api.search, q=query, since=start_date, count=100).items(max_tweets)
+tweets = tweepy.Cursor(api.search, q=query, since=start_date, count=100).items()
 
+counter = 0
 tw = TW()
 while True:
     try:
         for tweet in tweets:
             sleep(0.25)
-            print(tweet.created_at, tweet.user.name)
-            tw.addtweet(tweet._json)
+            counter += 1
+            if tweet.user.screen_name == 'okanbayulgen':
+                print('kamil')
+            print(tweet.created_at, tweet.id, tweet.retweeted, tweet.user.screen_name, counter)
+            # tw.addtweet(tweet._json)
             # store_tweet(tweet._json)
         tw.printme()
         break
