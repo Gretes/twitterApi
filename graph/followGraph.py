@@ -79,7 +79,7 @@ def find_followers(name, cayley_client, user_id=None, depth=0):
                     else:
                         days_past = 999
 
-                    print(follower_name, depth)
+                    print(follower_screen_name, depth)
                     if follower_id in searched_ids or days_past < 30:
                         print('Skipping already searched name', follower_name)
                         continue
