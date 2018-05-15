@@ -97,13 +97,13 @@ def find_followers(name, cayley_client, user_id=None, n=200, depth=0):
                     cayley_client.AddQuad(follower_id, 'time_zone', follower_time_zone)
                     cayley_client.AddQuad(follower_id, 'user_update_date', str(datetime.now().date()))
                     cayley_client.AddQuad(follower_id, 'follows', user_id)
-                    find_followers(follower_name, follower_id, cayley_client, depth=depth)
+                    find_followers(follower_name, cayley_client, follower_id, depth=depth)
 
             cayley_client.AddQuad(str(datetime.now().date()), 'followers_update_date', user_id)
             break
-        except tweepy.TweepError:
+        except tweepy.TweepError as e:
             print('DEBUG: tweepy error')
-            sleep(60)
+            sleep(5)
             continue
 
         except IOError:
