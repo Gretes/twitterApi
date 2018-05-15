@@ -27,7 +27,7 @@ client = pyley.CayleyClient("http://intelcon.freeddns.org:64210", "v1")
 g = pyley.GraphObject()
 
 searched_ids = []
-
+print('iteration started')
 def find_followers(name, cayley_client, user_id=None, depth=0):
     if depth == 0:
         user = api.get_user(screen_name=name)
