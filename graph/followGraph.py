@@ -5,6 +5,28 @@ from datetime import datetime
 from time import sleep
 import pyley
 
+import logging
+import logging.handlers
+
+LOGFILE = "info.log"
+
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.INFO)
+
+# create a file handler
+HANDLER = logging.handlers.RotatingFileHandler(
+    LOGFILE, maxBytes=100 * 1024 * 1024, backupCount=5)
+HANDLER.setLevel(logging.INFO)
+
+# create a logging format
+FORMATTER = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+HANDLER.setFormatter(FORMATTER)
+
+# add the handlers to the logger
+LOGGER.addHandler(HANDLER)
+
+
 with open('accountInfo.json') as data_file:
     accInfo = json.load(data_file)
 
@@ -27,7 +49,9 @@ client = pyley.CayleyClient("http://intelcon.freeddns.org:64210", "v1")
 g = pyley.GraphObject()
 
 searched_ids = []
-print('iteration started')
+LOGGER.info('iteration started')
+
+
 def find_followers(name, cayley_client, user_id=None, depth=0):
     if depth == 0:
         user = api.get_user(screen_name=name)
@@ -52,7 +76,7 @@ def find_followers(name, cayley_client, user_id=None, depth=0):
         cayley_client.AddQuad(user_id, 'time_zone', user_time_zone)
         cayley_client.AddQuad(user_id, 'user_update_date', str(datetime.now().date()))
     if depth >= 3:
-        print('Max depth reached!')
+        LOGGER.info('Max depth reached! ' + name + ' ' + str(depth))
         return
     depth += 1
     pages = tweepy.Cursor(api.followers, user_id=user_id, count=200).pages()
@@ -79,9 +103,8 @@ def find_followers(name, cayley_client, user_id=None, depth=0):
                     else:
                         days_past = 999
 
-                    print(follower_screen_name, depth)
                     if follower_id in searched_ids or days_past < 30:
-                        print('Skipping already searched name', follower_name)
+                        LOGGER.info('Skipping already searched name' + follower_screen_name)
                         continue
 
                     cayley_client.AddQuad(follower_id, 'name', follower_name)
@@ -101,17 +124,17 @@ def find_followers(name, cayley_client, user_id=None, depth=0):
             cayley_client.AddQuad(str(datetime.now().date()), 'followers_update_date', user_id)
             break
         except tweepy.TweepError as e:
-            print(e)
-            print('DEBUG: tweepy error')
+            LOGGER.error(e)
             sleep(5)
             continue
 
-        except IOError:
-            print('DEBUG: io error')
+        except IOError as e:
+            LOGGER.error(e)
             sleep(60)
             continue
 
         except StopIteration:
             break
+
 
 find_followers(myName, client)
