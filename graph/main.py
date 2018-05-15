@@ -3,7 +3,7 @@ import pyley
 # Create cayley client
 client = pyley.CayleyClient() # this creates client with default parameters `http://localhost:64210/api/v1/query/gizmo`
 #or  specify `url` and `version` parameters
-client = pyley.CayleyClient("http://localhost:64210", "v1")
+client = pyley.CayleyClient("http://intelcon.freeddns.org:64210", "v1")
 
 g = pyley.GraphObject()
 
@@ -22,5 +22,5 @@ g = pyley.GraphObject()
 
 # client.AddQuad('character:finn', 'type', 'human', '.')
 # client.AddQuad('character:finn', 'name', 'Finn')
-client.AddQuad('fuad', '<follows>', 'veli')
-client.AddQuad('veli', '<follows>', 'fuad')
+client.AddQuad('12313246', '<name>', 'veli')
+client.AddQuad('12312455', '<name>', 'fuad')
