@@ -26,9 +26,9 @@ myName = 'hrnzkan'
 client = pyley.CayleyClient("http://intelcon.freeddns.org:64210", "v1")
 g = pyley.GraphObject()
 
-searched_names = []
+searched_ids = []
 
-def find_followers(name, cayley_client, user_id=None, n=200, depth=0):
+def find_followers(name, cayley_client, user_id=None, depth=0):
     if depth == 0:
         user = api.get_user(screen_name=name)
         user_name = user.name
@@ -54,10 +54,8 @@ def find_followers(name, cayley_client, user_id=None, n=200, depth=0):
     if depth >= 3:
         print('Max depth reached!')
         return
-    searched_names.append(name)
     depth += 1
-    f_count = 0
-    pages = tweepy.Cursor(api.followers, screen_name=name, count=n).pages()
+    pages = tweepy.Cursor(api.followers, user_id=user_id, count=200).pages()
     while True:
         try:
             for page in pages:
@@ -82,7 +80,7 @@ def find_followers(name, cayley_client, user_id=None, n=200, depth=0):
                         days_past = 999
 
                     print(follower_name, depth)
-                    if follower_name in searched_names or days_past < 30:
+                    if follower_id in searched_ids or days_past < 30:
                         print('Skipping already searched name', follower_name)
                         continue
 
@@ -99,9 +97,11 @@ def find_followers(name, cayley_client, user_id=None, n=200, depth=0):
                     cayley_client.AddQuad(follower_id, 'follows', user_id)
                     find_followers(follower_name, cayley_client, follower_id, depth=depth)
 
+            searched_ids.append(name)
             cayley_client.AddQuad(str(datetime.now().date()), 'followers_update_date', user_id)
             break
         except tweepy.TweepError as e:
+            print(e)
             print('DEBUG: tweepy error')
             sleep(5)
             continue
