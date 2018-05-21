@@ -55,6 +55,7 @@ LOGGER.info('iteration started')
 
 def find_followers(name, cayley_client, user=None, depth=0):
     futures = []
+    LOGGER.info('find followers and add properties')
     if user is None:
         user = api.get_user(screen_name=name)
     user_name = user.name
@@ -82,18 +83,20 @@ def find_followers(name, cayley_client, user=None, depth=0):
     loop.run_until_complete(asyncio.wait(futures))
     # print(futures)
     if depth >= 3:
-        LOGGER.info('Max depth reached! ' + name + ' ' + str(depth))
+        LOGGER.info('Max depth reached!')
         return
     depth += 1
     pages = tweepy.Cursor(api.followers, user_id=user_id, count=200).pages()
     while True:
         try:
             for page in pages:
+                LOGGER.info('new page')
                 futures = []
                 for follower in page:
                     follower_name = follower.name
                     follower_screen_name = follower.screen_name
                     follower_id = follower.id_str
+                    LOGGER.info('follower' + follower_screen_name)
 
                     response = client.Send(g.Vertex(follower_id).In('followers_update_date').All()).result['result']
                     if response is not None:
@@ -119,12 +122,14 @@ def find_followers(name, cayley_client, user=None, depth=0):
             loop.run_until_complete(asyncio.wait(futures))
             break
         except tweepy.TweepError as e:
-            LOGGER.error(e)
+            LOGGER.info('Tweep error')
+            LOGGER.error(e.reason)
             sleep(5)
             continue
 
         except IOError as e:
-            LOGGER.error(e)
+            LOGGER.info('IOError')
+            LOGGER.error(e.strerror)
             sleep(60)
             continue
 
